@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot QR Code </title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="src/qr-code-styling.local.js" defer></script> <!-- Local version for customization -->
+    <!-- <script src="src/qr-code-styling.js" defer></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script> -->
+    <script src="src/qr-frontend.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <button id="dark-mode-toggle" class="dark-mode-button" title="Toggle dark mode">🌙</button>
+        <div id="logo-container" class="logo-container">
+            <img src="favicon.png" alt="Logo" class="logo-favicon">
+            <h1>QR Code Maker</h1>
+        </div>
+        
+        <!-- URL Input Section -->
+        <div class="input-section">
+            <h3>Enter URL or Text</h3>
+            <div class="url-input-container">
+                <input type="text" id="url-input" placeholder="Enter URL or text to generate QR code..." />
+                <button class="button" id="generate-btn">Generate QR Code</button>
+            </div>
+        </div>
+
+        <!-- QR Code Live Preview -->
+        <div id="qr-preview-section" class="qr-preview-section">
+            <h4>Live Preview</h4>
+            <div class="qr-code-container">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Customization & Image Upload Dropdown -->
+        <details class="customization-dropdown">
+            <summary class="customization-summary">Customize QR Code</summary>
+            <div class="customization-flex">
+                <!-- Customization Panel -->
+                <div class="customization-panel">
+                    <h3>Style</h3>
+                    <div class="customization-row">
+                        <div class="form-group">
+                            <label>QR Code Color:</label>
+                            <div class="color-selector">
+                                <div class="color-display" id="qr-color-display" tabindex="0"></div>
+                                <input type="color" id="qr-color" value="#F50000" style="display:none;" />
+                                <input type="text" id="qr-color-hex" class="color-value" maxlength="7" value="#F50000" />
+                                <button type="button" class="clear-color-btn" id="clear-qr-color" title="Clear QR color">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background Color:</label>
+                            <div class="color-selector">
+                                <div class="color-display" id="bg-color-display" tabindex="0"></div>
+                                <input type="color" id="bg-color" value="#FFFFFF" style="display:none;" />
+                                <input type="text" id="bg-color-hex" class="color-value" maxlength="7" value="#FFFFFF" />
+                                <button type="button" class="clear-color-btn" id="clear-bg-color" title="Clear background color">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Size:</label>
+                            <div class="size-buttons">
+                                <button type="button" class="size-btn" data-size="200">Small<br><span>200px</span></button>
+                                <button type="button" class="size-btn active" data-size="300">Medium<br><span>300px</span></button>
+                                <button type="button" class="size-btn" data-size="400">Large<br><span>400px</span></button>
+                                <button type="button" class="size-btn" data-size="500">X-Large<br><span>500px</span></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Style:</label>
+                            <div class="style-buttons">
+                                <button type="button" class="style-btn active" data-style="square">Square</button>
+                                <button type="button" class="style-btn" data-style="dot">Dot</button>
+                                <button type="button" class="style-btn" data-style="rounded">Rounded</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Image Uploader Inline -->
+                <div class="customization-panel image-panel">
+                    <h3>Add Center Image (Optional)</h3>
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-subtext">PNG, JPG, GIF up to 2MB</div>
+                        <input type="file" id="file-input" accept="image/*" />
+                    </div>
+                    <div id="image-preview"></div>
+                </div>
+            </div>
+        </details>
+
+        <!-- QR Code Result/Preview -->
+        <div id="qr-result" class="qr-result" style="display: none;">
+            <button class="button" id="download-btn">Download as PNG</button>
+        </div>
+    </div>
+</body>
+</html>

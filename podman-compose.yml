@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  qr-code-maker:
+    build:
+      context: .
+      dockerfile: Containerfile
+    ports:
+      - "5610:5610"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - qr_uploads:/usr/src/app/uploads
+    restart: unless-stopped
+    container_name: qr-code-maker
+
+volumes:
+  qr_uploads:
+    driver: local
