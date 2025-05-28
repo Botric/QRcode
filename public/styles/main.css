@@ -110,7 +110,8 @@ h1 {
     animation: wave 0.8s ease-in-out infinite;
 }
 
-.logo-container.logo-animate h1 {
+/* Apply colorShift animation when h1 has .text-animate class */
+h1.text-animate {
     animation: colorShift 1.5s linear infinite;
 }
 
@@ -169,7 +170,10 @@ h1 {
 }
 
 .customization-panel {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
     padding: 20px;
     background: #f8f9fa;
     border-radius: 10px;
@@ -178,7 +182,7 @@ h1 {
 
 .customization-panel h3 {
     color: #495057;
-    margin-bottom: 20px;
+
     font-size: 1.2rem;
 }
 
@@ -599,7 +603,7 @@ h1 {
     cursor: pointer;
     outline: none;
     background: linear-gradient(90deg, #ffd23f 0%, #ff6b35 100%);
-    border-radius: 12px 12px 0 0;
+    border-radius: 12px 12px 12px 12px;
     user-select: none;
 }
 .customization-dropdown[open] .customization-summary {
@@ -607,14 +611,23 @@ h1 {
 }
 .customization-flex {
     display: flex;
-    gap: 24px;
-    padding: 24px 30px 18px 30px;
-    flex-wrap: nowrap;
+}
+.customization-flex .customization-panel {
+    flex: 1 1 45%;
+    max-width: 45%;
+    box-sizing: border-box;
 }
 .image-panel {
     min-width: 320px;
     max-width: 100%;
     flex: 2 1 320px;
+}
+
+/* Ensure customization panels share space and don't overflow */
+.customization-flex .customization-panel {
+    flex: 1 1 300px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Responsive for new layout */
@@ -698,125 +711,38 @@ body.dark-mode h1 {
 body.dark-mode .input-section,
 body.dark-mode .customization-panel,
 body.dark-mode .qr-result {
-    background: #333;
-    border-color: #444;
+    background-color: #2a2a2a; /* Dark background for panels */
+    border-color: #444; /* Darker border */
+    color: #e0e0e0; /* Light text by default inside panels */
 }
 
 body.dark-mode .input-section h3,
-body.dark-mode .customization-panel h3 {
-    color: #ccc;
+body.dark-mode .customization-panel h3,
+body.dark-mode .qr-result .button {
+    color: #fff; /* Ensure headings and buttons text are white */
 }
 
-body.dark-mode #url-input {
-    background-color: #404040;
+body.dark-mode .customization-summary {
+    background: linear-gradient(90deg, #c7a00f 0%, #d65621 100%); /* Dark orange gradient */
+    color: #ffffff; /* White text */
+    border-color: #c7a00f !important;
+}
+
+body.dark-mode .customization-summary:hover {
+    background: linear-gradient(90deg, #b38f00 0%, #cc5600 100%);
+}
+
+body.dark-mode .customization-dropdown[open] .customization-summary {
+    border-bottom: 2px solid #c7a00f;
+}
+
+body.dark-mode .color-selector,
+body.dark-mode .size-btn,
+body.dark-mode .style-btn,
+body.dark-mode .remove-image-btn {
+    background-color: #3a3a3a;
     border-color: #555;
     color: #e0e0e0;
-}
-
-body.dark-mode #url-input:focus {
-    border-color: #ff8a50; /* Lighter orange for dark mode focus */
-    box-shadow: 0 0 0 3px rgba(255, 138, 80, 0.2);
-}
-
-body.dark-mode .button {
-    /* Keep button gradient, but adjust shadow if needed */
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2); 
-}
-
-body.dark-mode .button:hover {
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
-}
-
-body.dark-mode .form-group label {
-    color: #bbb;
-}
-
-body.dark-mode .form-group input,
-body.dark-mode .form-group select,
-body.dark-mode .color-selector input[type="text"] {
-    background-color: #404040;
-    border-color: #555;
-    color: #e0e0e0;
-}
-
-body.dark-mode .form-group input:focus,
-body.dark-mode .form-group select:focus,
-body.dark-mode .color-selector input[type="text"]:focus {
-    border-color: #ff8a50;
-    box-shadow: 0 0 0 3px rgba(255, 138, 80, 0.1);
-}
-
-body.dark-mode .upload-area {
-    border-color: #f7931e; /* Keep orange border for visibility */
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
-}
-
-body.dark-mode .upload-area:hover {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(247, 147, 30, 0.15));
-    border-color: #ff6b35;
-}
-
-body.dark-mode .upload-area.dragover {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(247, 147, 30, 0.2));
-    border-color: #ff6b35;
-}
-
-body.dark-mode .upload-text {
-    color: #ccc;
-}
-
-body.dark-mode .upload-subtext {
-    color: #999;
-}
-
-body.dark-mode .preview-image {
-    border-color: #555;
-}
-
-body.dark-mode .error-message {
-    background-color: #5c1a1e;
-    border-color: #8c2b30;
-    color: #f8d7da;
-}
-
-body.dark-mode .success-message {
-    background-color: #1c3b23;
-    border-color: #2c5b37;
-    color: #d4edda;
-}
-
-body.dark-mode #qr-preview-section {
-    background: linear-gradient(135deg, rgba(255, 210, 63, 0.15), rgba(247, 147, 30, 0.15));
-    border-color: rgba(255, 210, 63, 0.4);
-}
-
-body.dark-mode #qr-preview-section h4 {
-    /* Gradient text might be hard to read, consider solid color or adjust gradient */
-    color: #ff8a50; /* Example: Lighter orange for dark mode */
-    -webkit-text-fill-color: initial; /* Reset for solid color */
-    background: none; /* Reset for solid color */
-}
-
-body.dark-mode .qr-preview-container {
-    background: #3a3a3a;
-    border-color: #ffd23f;
-}
-
-body.dark-mode #qr-preview-canvas {
-    background: #2c2c2c; /* Darker background for preview canvas in dark mode */
-}
-
-body.dark-mode .color-selector {
-    background: #404040;
-    border-color: #555;
-}
-
-body.dark-mode .color-selector:hover {
-    border-color: #ff8a50;
-}
-
-body.dark-mode .color-display {
-    border-color: #555;
 }
 
 body.dark-mode .clear-color-btn {
@@ -830,50 +756,82 @@ body.dark-mode .clear-color-btn:hover {
     color: #fff;
 }
 
-body.dark-mode .size-btn,
-body.dark-mode .style-btn {
+body.dark-mode .dark-mode-button,
+body.dark-mode .clear-color-btn,
+body.dark-mode .remove-image-btn {
+    /* ensure icons contrast */
+}
+
+/* Ensure inputs, selects, and text areas are styled in dark mode */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
     background-color: #444;
-    color: #ddd;
+    color: #e0e0e0;
     border-color: #555;
 }
 
-body.dark-mode .size-btn.active,
-body.dark-mode .style-btn.active {
-    background: linear-gradient(45deg, #e85a2b, #e8841a); /* Keep active state vibrant */
-    color: white;
-    border-color: transparent;
-}
-
-body.dark-mode .size-btn:hover:not(.active),
-body.dark-mode .style-btn:hover:not(.active) {
-    background-color: #505050;
+body.dark-mode #url-input,
+body.dark-mode .color-value {
+    background-color: #555;
+    color: #ffffff;
     border-color: #666;
 }
 
-body.dark-mode .customization-summary {
-    background-color: #3a3a3a;
-    border-color: #555;
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode label {
     color: #e0e0e0;
 }
 
-body.dark-mode .customization-summary:hover {
-    background-color: #454545;
-}
-
-body.dark-mode .customization-dropdown[open] .customization-summary {
-    background-color: #4a4a4a;
-}
-
-body.dark-mode .customization-flex {
+body.dark-mode .qr-preview-section {
+    background-color: #333;
     border-color: #444;
 }
 
-body.dark-mode .remove-image-btn {
-    background-color: #505050;
-    color: #ccc;
+/* Remove any empty ruleset */
+
+/* Logo hover animation fallback */
+.logo-container:hover {
+    animation: wave 0.8s ease-in-out infinite;
 }
 
-body.dark-mode .remove-image-btn:hover {
-    background-color: #606060;
-    color: #fff;
+.logo-container:hover h1 {
+    animation: colorShift 1.5s linear infinite;
+}
+
+/* Image preview container in customization panel */
+.image-panel #image-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-panel #image-preview img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+    display: block;
+}
+
+/* Style for remove image button */
+.remove-image-btn {
+    background-color: #f7931e;
+    color: white;
+    border: none;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.remove-image-btn:hover {
+    background-color: #e85a2b;
 }

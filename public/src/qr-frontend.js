@@ -62,16 +62,20 @@ class QRCodeGenerator {
             });
         }
         // Fancy logo animation on hover
-        const logo = document.getElementById('logo-container'); // Updated to target the new container
-        if (logo) {
+        const logo = document.getElementById('logo-container');
+        const h1 = logo ? logo.querySelector('h1') : null;
+
+        if (logo && h1) {
             logo.addEventListener('mouseenter', () => {
                 logo.classList.add('logo-animate');
+                h1.classList.add('text-animate'); // Add class to h1 for text animation
             });
             logo.addEventListener('mouseleave', () => {
                 logo.classList.remove('logo-animate');
+                h1.classList.remove('text-animate'); // Remove class from h1
             });
         } else {
-            console.warn("Logo element 'logo-container' not found for animation.");
+            console.warn("Logo container or h1 element not found for animation.");
         }
         this.updatePreview(); // Show preview on load
         this.initDarkMode(); // Initialize dark mode
@@ -97,13 +101,11 @@ class QRCodeGenerator {
 
         // Check local storage for saved preference
         const storedPreference = localStorage.getItem('darkMode');
-        if (storedPreference === 'enabled') {
-            enableDarkMode();
-        } else if (storedPreference === 'disabled') {
-            disableDarkMode(); // Respect the user's choice if they set it to light mode
+        if (storedPreference === 'disabled') { // Check if light mode was explicitly chosen
+            disableDarkMode();
         } else {
-            // No preference stored, default to dark mode
-            enableDarkMode();
+            // Default to dark mode if no preference or preference is 'enabled'
+            enableDarkMode(); 
         }
 
         // Toggle dark mode on button click
@@ -243,8 +245,8 @@ class QRCodeGenerator {
             reader.onload = (e) => {
                 const previewContainer = document.getElementById('image-preview');
                 previewContainer.innerHTML = `
-                    <img src="${e.target.result}" alt="Image Preview" style="max-width: 100px; max-height: 100px; margin-top: 10px;">
-                    <button type="button" id="remove-image-btn" class="remove-image-btn" title="Remove image">✕</button>
+                    <img src="${e.target.result}" alt="Image Preview" class="preview-image">
+                    <button type="button" id="remove-image-btn" class="remove-image-btn" title="Remove image">&times;</button>
                 `;
                 document.getElementById('remove-image-btn').addEventListener('click', () => this.removeImage());
                 this.updateQRCode(); // Update QR code when image is added
@@ -500,4 +502,26 @@ function waitForQRCodeStyling(callback, retries = 20) {
 
 waitForQRCodeStyling(() => {
     window.qrGenerator = new QRCodeGenerator();
+});
+
+// Global dark mode init to ensure toggle works immediately
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleButton = document.getElementById('dark-mode-toggle');
+    const body = document.body;
+    if (!toggleButton) return;
+    const enableDark = () => {
+        body.classList.add('dark-mode');
+        toggleButton.textContent = '☀️';
+        localStorage.setItem('darkMode', 'enabled');
+    };
+    const disableDark = () => {
+        body.classList.remove('dark-mode');
+        toggleButton.textContent = '🌙';
+        localStorage.setItem('darkMode', 'disabled');
+    };
+    const pref = localStorage.getItem('darkMode');
+    if (pref === 'disabled') disableDark(); else enableDark();
+    toggleButton.addEventListener('click', () => {
+        if (body.classList.contains('dark-mode')) disableDark(); else enableDark();
+    });
 });
