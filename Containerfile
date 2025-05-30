@@ -15,6 +15,10 @@ RUN npm install
 COPY ./src ./src
 COPY ./public ./public
 
+# Install PM2 global
+RUN npm install -g pm2
+
 EXPOSE 5610
 
-CMD ["node", "src/app.js"]
+# Change entrypoint to pm2-runtime
+CMD ["pm2-runtime", "src/app.js"]
