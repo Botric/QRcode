@@ -1,0 +1,10 @@
+{
+  "name": "QR Code Maker",
+  "short_name": "QR Maker",
+  "description": "Create customizable QR codes with colors, styles, sizes, and optional center images.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

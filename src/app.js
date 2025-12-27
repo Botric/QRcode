@@ -9,14 +9,18 @@ const PORT = Number(process.env.PORT) || 5610;
 app.disable('x-powered-by');
 app.set('etag', 'strong');
 
+const distDir = path.join(__dirname, '../dist');
 const publicDir = path.join(__dirname, '../public');
-const indexHtmlPath = path.join(publicDir, 'index.html');
+
+const hasDist = fs.existsSync(path.join(distDir, 'index.html'));
+const webRootDir = hasDist ? distDir : publicDir;
+const indexHtmlPath = path.join(webRootDir, 'index.html');
 
 let indexTemplate = null;
 try {
   indexTemplate = fs.readFileSync(indexHtmlPath, 'utf8');
 } catch (err) {
-  console.error('Failed to read public/index.html:', err);
+  console.error('Failed to read index.html:', err);
 }
 
 const getSiteUrl = (req) => {
@@ -27,19 +31,55 @@ const getSiteUrl = (req) => {
   return host ? `${proto}://${host}` : 'http://localhost:' + PORT;
 };
 
+// Basic security headers (kept compatible with the current CDN script + inline JSON-LD)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+
+  // Note: We allow jsdelivr + inline scripts because index.html includes JSON-LD.
+  // If you later bundle scripts (no inline), we can tighten this further.
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "frame-src https://ko-fi.com https://storage.ko-fi.com",
+      "img-src 'self' data: blob: https://www.google-analytics.com",
+      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://storage.ko-fi.com https://www.googletagmanager.com",
+      "connect-src 'self' https://ko-fi.com https://storage.ko-fi.com https://www.google-analytics.com https://region1.google-analytics.com",
+      "object-src 'none'"
+    ].join('; ')
+  );
+
+  next();
+});
+
 // Middleware
 app.use(compression());
 app.use(express.json({ limit: '100kb' }));
 
 // Static assets (cacheable)
 app.use(
-  express.static(publicDir, {
+  express.static(webRootDir, {
     index: false,
     etag: true,
     maxAge: '7d',
     setHeaders: (res, filePath) => {
-      // Avoid shipping stale HTML/JS/CSS after redeploys (no hash-based filenames here)
-      if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      // If we have a Vite build (hashed assets), allow long caching for JS/CSS.
+      // Otherwise (dev / no build), avoid stale assets.
+      const isHtml = filePath.endsWith('.html');
+      const isJsOrCss = filePath.endsWith('.js') || filePath.endsWith('.css');
+      if (isHtml) {
+        res.setHeader('Cache-Control', 'no-cache');
+        return;
+      }
+      if (isJsOrCss && !hasDist) {
         res.setHeader('Cache-Control', 'no-cache');
       }
     }
@@ -69,6 +109,15 @@ app.get('/', (req, res) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.sendStatus(200);
+});
+
+app.get('/version', (req, res) => {
+  res.json({
+    name: 'qr-code-maker',
+    version: process.env.APP_VERSION || 'unknown',
+    commit: process.env.GIT_SHA || 'unknown',
+    node: process.version
+  });
 });
 
 // robots.txt + sitemap.xml for SEO

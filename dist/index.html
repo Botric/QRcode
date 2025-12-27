@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Maker - Create Custom QR Codes</title>
+    <meta name="description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="{{CANONICAL_URL}}" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="/assets/manifest-Ckq3pP1r.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="QR Code Maker" />
+    <meta property="og:title" content="QR Code Maker - Create Custom QR Codes" />
+    <meta property="og:description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta property="og:url" content="{{CANONICAL_URL}}" />
+    <meta property="og:image" content="{{SITE_URL}}/favicon.png" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="QR Code Maker - Create Custom QR Codes" />
+    <meta name="twitter:description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta name="twitter:image" content="{{SITE_URL}}/favicon.png" />
+    <link rel="icon" type="image/png" href="/assets/favicon-CDDflszz.png">
+    <link rel="apple-touch-icon" href="/assets/favicon-CDDflszz.png">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-E1XCZXSBCR"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-E1XCZXSBCR');
+        </script>
+
+    <script src="src/qr-code-styling.local.js" defer></script>
+    <!-- <script src="src/qr-code-styling.js" defer></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script> -->
+
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "QR Code Maker",
+            "url": "{{CANONICAL_URL}}",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "All"
+        }
+        </script>
+  <script type="module" crossorigin src="/assets/main-OHTVQzw7.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/main-BvhoQYi5.css">
+</head>
+<body>
+    <div id="app">
+        <button id="dark-mode-toggle" class="dark-mode-button" title="Toggle dark mode">🌙</button>
+        <div id="logo-container" class="logo-container">
+            <img src="/assets/favicon-CDDflszz.png" alt="Logo" class="logo-favicon">
+            <h1>QR Code Maker</h1>
+        </div>
+        
+        <!-- URL Input Section -->
+        <div class="input-section">
+            <h3>Enter URL or Text</h3>
+            <div class="url-input-container">
+                <input type="text" id="url-input" placeholder="Enter URL or text to generate QR code..." />
+                <button class="button" id="generate-btn">Generate QR Code</button>
+            </div>
+        </div>
+
+        <!-- QR Code Live Preview -->
+        <div id="qr-preview-section" class="qr-preview-section">
+            <h4>Live Preview</h4>
+            <div class="qr-code-container">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Customization & Image Upload Dropdown -->
+        <details class="customization-dropdown">
+            <summary class="customization-summary">Customize QR Code</summary>
+            <div class="customization-flex">
+                <!-- Customization Panel -->
+                <div class="customization-panel">
+                    <h3>Style</h3>
+                    <div class="customization-row">
+                        <div class="form-group">
+                            <label>QR Code Color:</label>
+                            <div class="color-selector">
+                                <div class="color-display" id="qr-color-display" tabindex="0"></div>
+                                <input type="color" id="qr-color" value="#000000" style="display:none;" />
+                                <input type="text" id="qr-color-hex" class="color-value" maxlength="7" value="#000000" />
+                                <button type="button" class="clear-color-btn" id="clear-qr-color" title="Clear QR color">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background Color:</label>
+                            <div class="color-selector">
+                                <div class="color-display" id="bg-color-display" tabindex="0"></div>
+                                <input type="color" id="bg-color" value="#FFFFFF" style="display:none;" />
+                                <input type="text" id="bg-color-hex" class="color-value" maxlength="7" value="#FFFFFF" />
+                                <button type="button" class="clear-color-btn" id="clear-bg-color" title="Clear background color">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Size:</label>
+                            <div class="size-buttons">
+                                <button type="button" class="size-btn" data-size="200">Small<br><span>200px</span></button>
+                                <button type="button" class="size-btn active" data-size="300">Medium<br><span>300px</span></button>
+                                <button type="button" class="size-btn" data-size="400">Large<br><span>400px</span></button>
+                                <button type="button" class="size-btn" data-size="500">X-Large<br><span>500px</span></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Style:</label>
+                            <div class="style-buttons">
+                                <button type="button" class="style-btn active" data-style="square">Square</button>
+                                <button type="button" class="style-btn" data-style="dots">Dot</button>
+                                <button type="button" class="style-btn" data-style="rounded">Rounded</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Image Uploader Inline -->
+                <div class="customization-panel image-panel">
+                    <h3>Add Center Image (Optional)</h3>
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-subtext">PNG, JPG, GIF up to 2MB</div>
+                        <input type="file" id="file-input" accept="image/*" />
+                    </div>
+                    <div id="image-preview"></div>
+                </div>
+            </div>
+        </details>
+
+        <!-- QR Code Result/Preview -->
+        <div id="qr-result" class="qr-result" style="display: none;">
+            <button class="button" id="download-btn">Download as PNG</button>
+        </div>
+        <footer class="footer-text">© Botric 2025</footer>
+    </div>
+
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+        <script>
+            kofiWidgetOverlay.draw('botric', {
+                'type': 'floating-chat',
+                'floating-chat.donateButton.text': 'Support me',
+                'floating-chat.donateButton.background-color': '#f45d22',
+                'floating-chat.donateButton.text-color': '#fff'
+            });
+        </script>
+</body>
+</html>

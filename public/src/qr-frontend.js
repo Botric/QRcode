@@ -468,18 +468,13 @@ class QRCodeGenerator {
     }
 }
 
-// Load qr-code-styling library
-const script = document.createElement('script');
-script.src = 'https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js';
-document.head.appendChild(script);
-
 function waitForQRCodeStyling(callback, retries = 20) {
     if (window.QRCodeStyling) {
         callback();
     } else if (retries > 0) {
         setTimeout(() => waitForQRCodeStyling(callback, retries - 1), 150);
     } else {
-        document.body.insertAdjacentHTML('afterbegin', '<div class="error-message">QR code styling library failed to load. Please check your internet connection or CDN access.</div>');
+        document.body.insertAdjacentHTML('afterbegin', '<div class="error-message">QR code styling library failed to load.</div>');
     }
 }
 
