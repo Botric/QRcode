@@ -1,0 +1,21 @@
+name: Deploy QRcode
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Update code
+        run: |
+          cd /opt/qrcode
+          git fetch --all
+          git reset --hard origin/main
+
+      - name: Rebuild + restart
+        run: |
+          cd /opt/qrcode
+          podman-compose build --no-cache
+          sudo systemctl restart qrcode
