@@ -9,6 +9,8 @@ services:
       - "5610:5610"
     environment:
       - NODE_ENV=production
+      # Set this in production so canonical URLs + sitemap use your real domain
+      # - SITE_URL=https://your-domain.com
     volumes:
       - qr_uploads:/usr/src/app/uploads
     restart: unless-stopped

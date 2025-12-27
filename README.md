@@ -155,6 +155,14 @@ To modify the application:
 - `NODE_ENV`: Set to 'production' in container
 - `PORT`: Server port (default: 5610)
 
+## SEO (Getting Indexed by Google)
+- The app serves `robots.txt` and `sitemap.xml` automatically.
+- Set `SITE_URL` in production so canonical URLs and the sitemap use your real domain (example: `https://qrcode.yourdomain.com`).
+- In Google Search Console:
+   - Add and verify your domain/property
+   - Submit `https://your-domain.com/sitemap.xml`
+   - Use the URL Inspection tool to request indexing for `/`
+
 
 ## License
 This project is licensed under the MIT License.

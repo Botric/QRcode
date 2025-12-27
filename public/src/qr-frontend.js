@@ -1,4 +1,12 @@
 // QR Code Generator Frontend JavaScript
+const debounce = (fn, waitMs) => {
+    let timeoutId;
+    return (...args) => {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => fn(...args), waitMs);
+    };
+};
+
 class QRCodeGenerator {
     constructor() {
         this.centerImage = null;
@@ -7,6 +15,12 @@ class QRCodeGenerator {
         this.qrStyler = null;
         this.currentSize = 300;
         this.currentStyle = 'square';
+
+        this.scheduleUpdate = debounce(() => {
+            const text = this.urlInput?.value?.trim();
+            if (text) this.renderQRCode(text);
+        }, 150);
+
         this.init();
     }
 
@@ -32,13 +46,8 @@ class QRCodeGenerator {
         this.sizeButtons = document.querySelectorAll('.size-btn');
         this.styleButtons = document.querySelectorAll('.style-btn');
         
-        // Preview elements
+        // Preview elements (legacy; main canvas is rendered into .qr-code-container)
         this.qrPreviewSection = document.getElementById('qr-preview-section');
-        this.qrPreviewCanvas = document.getElementById('qr-preview-canvas');
-        this.qrPreviewStyler = null;
-        this.qrStyler = null;
-        this.currentSize = 300;
-        this.currentStyle = 'square';
         
         // Bind events
         this.bindEvents();
@@ -77,7 +86,7 @@ class QRCodeGenerator {
         } else {
             console.warn("Logo container or h1 element not found for animation.");
         }
-        this.updatePreview(); // Show preview on load
+        this.updateQRCode(); // Show initial state
         this.initDarkMode(); // Initialize dark mode
     }
 
@@ -176,11 +185,8 @@ class QRCodeGenerator {
         this.qrColorInput.addEventListener('change', () => this.updateQRCode());
         this.bgColorInput.addEventListener('change', () => this.updateQRCode());
         
-        // Real-time preview when URL changes
-        this.urlInput.addEventListener('input', () => {
-            this.updatePreview();
-            this.updateQRCode();
-        });
+        // Real-time updates (debounced)
+        this.urlInput.addEventListener('input', () => this.updateQRCode());
         
         // Initialize color displays
         this.updateColorDisplay('qr', '#000000');
@@ -276,12 +282,15 @@ class QRCodeGenerator {
 
     updateQRCode() {
         const text = this.urlInput.value.trim();
-        if (text) this.renderQRCode(text);
+        if (text) {
+            this.scheduleUpdate();
+        }
     }
 
     // --- Fix for style button logic ---
     // Map UI style to qr-code-styling type
     getStyleType(style) {
+        if (style === 'dot' || style === 'dots') return 'dots';
         if (style === 'rounded') return 'extra-rounded';
         return style;
     }
@@ -292,8 +301,7 @@ class QRCodeGenerator {
             this.showMessage('QR code styling library not loaded.', 'error');
             return;
         }
-        if (this.qrStyler) this.qrStyler.update({});
-        this.qrStyler = new QRCodeStyling({
+        const options = {
             width: this.currentSize,
             height: this.currentSize,
             data: text,
@@ -308,49 +316,27 @@ class QRCodeGenerator {
             imageOptions: {
                 crossOrigin: 'anonymous',
                 margin: 0,
-                imageSize: 0.35 // Make center image bigger in main QR
+                imageSize: 0.35
             }
-        });
-        // Remove previous QR canvas if present
+        };
+
         const parent = document.querySelector('.qr-code-container');
-        parent.querySelectorAll('canvas').forEach(c => c.remove());
-        this.qrStyler.append(parent);
-        this.qrCanvas = parent.querySelector('canvas');
+        if (!parent) return;
+
+        if (!this.qrStyler) {
+            this.qrStyler = new QRCodeStyling(options);
+            parent.innerHTML = '';
+            this.qrStyler.append(parent);
+        } else {
+            this.qrStyler.update(options);
+        }
+
+        this.qrCanvas = parent.querySelector('canvas') || null;
         document.getElementById('qr-result').style.display = 'block';
     }
 
-    updatePreview() {
-        const text = this.urlInput.value.trim();
-        if (!window.QRCodeStyling || !this.qrPreviewCanvas) return;
-        const parent = this.qrPreviewCanvas.parentNode;
-        // Remove previous preview canvas if present
-        parent.querySelectorAll('canvas').forEach(c => c.remove());
-        if (!text) {
-            // If no text, just clear preview
-            return;
-        }
-        // Always create a new preview QR code for the full input
-        this.qrPreviewStyler = new QRCodeStyling({
-            width: 120,
-            height: 120,
-            data: text,
-            dotsOptions: {
-                color: this.qrColorInput.value,
-                type: this.getStyleType(this.currentStyle) || 'square'
-            },
-            backgroundOptions: {
-                color: this.bgColorInput.value
-            },
-            image: this.centerImage ? this.centerImage.src : undefined,
-            imageOptions: {
-                crossOrigin: 'anonymous',
-                margin: 0,
-                imageSize: 0.35
-            }
-        });
-        this.qrPreviewStyler.append(parent);
-        this.qrPreviewCanvas = parent.querySelector('canvas');
-    }
+    // Legacy no-op: older code paths call updatePreview()
+    updatePreview() {}
 
     downloadQRCode() {
         if (this.qrStyler) {
@@ -373,7 +359,6 @@ class QRCodeGenerator {
             this.bgColorDisplay.style.backgroundColor = hex;
         }
         this.updateQRCode();
-        this.updatePreview();
     }
 
     selectSize(button) {
@@ -388,7 +373,6 @@ class QRCodeGenerator {
         
         // Update QR code
         this.updateQRCode();
-        this.updatePreview();
     }
 
     selectStyle(button) {
@@ -403,7 +387,6 @@ class QRCodeGenerator {
         
         // Update QR code
         this.updateQRCode();
-        this.updatePreview();
     }
 
     processFile(file) {

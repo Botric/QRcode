@@ -3,14 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot QR Code </title>
+    <title>QR Code Maker - Create Custom QR Codes</title>
+    <meta name="description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="{{CANONICAL_URL}}" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="QR Code Maker" />
+    <meta property="og:title" content="QR Code Maker - Create Custom QR Codes" />
+    <meta property="og:description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta property="og:url" content="{{CANONICAL_URL}}" />
+    <meta property="og:image" content="{{SITE_URL}}/favicon.png" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="QR Code Maker - Create Custom QR Codes" />
+    <meta name="twitter:description" content="Create customizable QR codes with colors, styles, sizes, and optional center images. Download high-quality PNG QR codes instantly." />
+    <meta name="twitter:image" content="{{SITE_URL}}/favicon.png" />
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="src/qr-code-styling.local.js" defer></script> <!-- Local version for customization -->
     <!-- <script src="src/qr-code-styling.js" defer></script> -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script> -->
     <script src="src/qr-frontend.js" defer></script>
+
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "QR Code Maker",
+            "url": "{{CANONICAL_URL}}",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "All"
+        }
+        </script>
 </head>
 <body>
     <div id="app">
@@ -76,7 +104,7 @@
                             <label>Style:</label>
                             <div class="style-buttons">
                                 <button type="button" class="style-btn active" data-style="square">Square</button>
-                                <button type="button" class="style-btn" data-style="dot">Dot</button>
+                                <button type="button" class="style-btn" data-style="dots">Dot</button>
                                 <button type="button" class="style-btn" data-style="rounded">Rounded</button>
                             </div>
                         </div>
