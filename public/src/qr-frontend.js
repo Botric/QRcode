@@ -1,3 +1,5 @@
+import QRCodeStyling from 'qr-code-styling';
+
 // QR Code Generator Frontend JavaScript
 const debounce = (fn, waitMs) => {
     let timeoutId;
@@ -296,11 +298,6 @@ class QRCodeGenerator {
     }
 
     renderQRCode(text) {
-        // Use qr-code-styling for style customization
-        if (!window.QRCodeStyling) {
-            this.showMessage('QR code styling library not loaded.', 'error');
-            return;
-        }
         const options = {
             width: this.currentSize,
             height: this.currentSize,
@@ -468,38 +465,6 @@ class QRCodeGenerator {
     }
 }
 
-function waitForQRCodeStyling(callback, retries = 20) {
-    if (window.QRCodeStyling) {
-        callback();
-    } else if (retries > 0) {
-        setTimeout(() => waitForQRCodeStyling(callback, retries - 1), 150);
-    } else {
-        document.body.insertAdjacentHTML('afterbegin', '<div class="error-message">QR code styling library failed to load.</div>');
-    }
-}
-
-waitForQRCodeStyling(() => {
-    window.qrGenerator = new QRCodeGenerator();
-});
-
-// Global dark mode init to ensure toggle works immediately
 document.addEventListener('DOMContentLoaded', () => {
-    const toggleButton = document.getElementById('dark-mode-toggle');
-    const body = document.body;
-    if (!toggleButton) return;
-    const enableDark = () => {
-        body.classList.add('dark-mode');
-        toggleButton.textContent = '☀️';
-        localStorage.setItem('darkMode', 'enabled');
-    };
-    const disableDark = () => {
-        body.classList.remove('dark-mode');
-        toggleButton.textContent = '🌙';
-        localStorage.setItem('darkMode', 'disabled');
-    };
-    const pref = localStorage.getItem('darkMode');
-    if (pref === 'disabled') disableDark(); else enableDark();
-    toggleButton.addEventListener('click', () => {
-        if (body.classList.contains('dark-mode')) disableDark(); else enableDark();
-    });
+    window.qrGenerator = new QRCodeGenerator();
 });
