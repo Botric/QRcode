@@ -302,7 +302,9 @@ class QRCodeGenerator {
             imageOptions: {
                 crossOrigin: 'anonymous',
                 margin: 0,
-                imageSize: 0.35
+                imageSize: 0.35,
+                // Prevent fetch(data:...) in strict CSP environments.
+                saveAsBlob: false
             }
         };
 

@@ -53,7 +53,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline' https://storage.ko-fi.com https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://storage.ko-fi.com https://www.googletagmanager.com",
-      "connect-src 'self' https://ko-fi.com https://storage.ko-fi.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+      "connect-src 'self' data: blob: https://ko-fi.com https://storage.ko-fi.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
       "object-src 'none'"
     ].join('; ')
   );
