@@ -62,7 +62,6 @@
             <h3>Enter URL or Text</h3>
             <div class="url-input-container">
                 <input type="text" id="url-input" placeholder="Enter URL or text to generate QR code..." />
-                <button class="button" id="generate-btn">Generate QR Code</button>
             </div>
         </div>
 
@@ -84,11 +83,22 @@
                     <div class="customization-row">
                         <div class="form-group">
                             <label>QR Code Color:</label>
+                            <select id="qr-color-mode" class="color-mode-select">
+                                <option value="solid" selected>Solid</option>
+                                <option value="gradient-horizontal">Gradient (Horizontal)</option>
+                                <option value="gradient-vertical">Gradient (Vertical)</option>
+                                <option value="radial">Gradient (Radial)</option>
+                            </select>
                             <div class="color-selector">
                                 <div class="color-display" id="qr-color-display" tabindex="0"></div>
                                 <input type="color" id="qr-color" value="#000000" style="display:none;" />
                                 <input type="text" id="qr-color-hex" class="color-value" maxlength="7" value="#000000" />
                                 <button type="button" class="clear-color-btn" id="clear-qr-color" title="Clear QR color">✕</button>
+                            </div>
+                            <div class="color-selector" id="qr-secondary-color-group" style="display:none; margin-top:8px;">
+                                <div class="color-display" id="qr-color-2-display" tabindex="0"></div>
+                                <input type="color" id="qr-color-2" value="#FF6B35" style="display:none;" />
+                                <input type="text" id="qr-color-2-hex" class="color-value" maxlength="7" value="#FF6B35" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -133,9 +143,6 @@
         </details>
 
         <!-- QR Code Result/Preview -->
-        <div id="qr-result" class="qr-result" style="display: none;">
-            <button class="button" id="download-btn">Download as PNG</button>
-        </div>
         <footer class="footer-text">© Botric 2025</footer>
     </div>
 

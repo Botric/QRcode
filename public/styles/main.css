@@ -137,6 +137,7 @@ h1.text-animate {
 
 #url-input {
     flex: 1;
+    width: 100%;
     padding: 12px 15px;
     border: 2px solid #dee2e6;
     border-radius: 8px;
@@ -440,6 +441,17 @@ h1.text-animate {
     border-radius: 8px;
     background: white;
     transition: border-color 0.3s ease;
+}
+
+.color-mode-select {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .color-selector:hover {
@@ -766,6 +778,12 @@ body.dark-mode .remove-image-btn {
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
+    background-color: #444;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark-mode .color-mode-select {
     background-color: #444;
     color: #e0e0e0;
     border-color: #555;

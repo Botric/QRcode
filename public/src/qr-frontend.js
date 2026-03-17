@@ -13,25 +13,30 @@ class QRCodeGenerator {
     constructor() {
         this.centerImage = null;
         this.qrCanvas = null;
-        this.qrPreviewStyler = null;
         this.qrStyler = null;
         this.currentSize = 300;
         this.currentStyle = 'square';
+        this.currentColorMode = 'solid';
 
         this.scheduleUpdate = debounce(() => {
             const text = this.urlInput?.value?.trim();
-            if (text) this.renderQRCode(text);
+            if (text) {
+                this.renderQRCode(text);
+            }
         }, 150);
 
         this.init();
     }
 
-    init() {        // Get DOM elements
+    init() {
         this.urlInput = document.getElementById('url-input');
-        this.generateBtn = document.getElementById('generate-btn');
         this.qrColorInput = document.getElementById('qr-color');
         this.qrColorHexInput = document.getElementById('qr-color-hex');
         this.qrColorDisplay = document.getElementById('qr-color-display');
+        this.qrColorSecondaryInput = document.getElementById('qr-color-2');
+        this.qrColorSecondaryHexInput = document.getElementById('qr-color-2-hex');
+        this.qrColorSecondaryDisplay = document.getElementById('qr-color-2-display');
+        this.qrColorMode = document.getElementById('qr-color-mode');
         this.bgColorInput = document.getElementById('bg-color');
         this.bgColorHexInput = document.getElementById('bg-color-hex');
         this.bgColorDisplay = document.getElementById('bg-color-display');
@@ -40,56 +45,38 @@ class QRCodeGenerator {
         this.fileInput = document.getElementById('file-input');
         this.uploadArea = document.getElementById('upload-area');
         this.imagePreview = document.getElementById('image-preview');
-        this.qrResult = document.getElementById('qr-result');
-        this.qrCanvas = document.getElementById('qr-canvas');
-        this.downloadBtn = document.getElementById('download-btn');
-        
-        // Size buttons
+
         this.sizeButtons = document.querySelectorAll('.size-btn');
         this.styleButtons = document.querySelectorAll('.style-btn');
-        
-        // Preview elements (legacy; main canvas is rendered into .qr-code-container)
-        this.qrPreviewSection = document.getElementById('qr-preview-section');
-        
-        // Bind events
+
         this.bindEvents();
-        // Attach clear color button events after DOM is ready
-        const clearQrBtn = document.getElementById('clear-qr-color');
-        if (clearQrBtn) {
-            clearQrBtn.addEventListener('click', () => {
-                this.qrColorInput.value = '#000000';
-                this.qrColorHexInput.value = '#000000';
-                this.qrColorDisplay.style.backgroundColor = '#000000';
-                this.setColor('qr', '#000000');
-            });
-        }
-        const clearBgBtn = document.getElementById('clear-bg-color');
-        if (clearBgBtn) {
-            clearBgBtn.addEventListener('click', () => {
-                this.bgColorInput.value = '#ffffff';
-                this.bgColorHexInput.value = '#ffffff';
-                this.bgColorDisplay.style.backgroundColor = '#ffffff';
-                this.setColor('bg', '#ffffff');
-            });
-        }
-        // Fancy logo animation on hover
+        this.initLogoAnimation();
+        this.initDarkMode();
+
+        this.updateColorDisplay('qr', '#000000');
+        this.updateColorDisplay('qr2', '#FF6B35');
+        this.updateColorDisplay('bg', '#ffffff');
+        this.updateSecondaryColorVisibility();
+        this.updateQRCode();
+    }
+
+    initLogoAnimation() {
         const logo = document.getElementById('logo-container');
         const h1 = logo ? logo.querySelector('h1') : null;
 
-        if (logo && h1) {
-            logo.addEventListener('mouseenter', () => {
-                logo.classList.add('logo-animate');
-                h1.classList.add('text-animate'); // Add class to h1 for text animation
-            });
-            logo.addEventListener('mouseleave', () => {
-                logo.classList.remove('logo-animate');
-                h1.classList.remove('text-animate'); // Remove class from h1
-            });
-        } else {
-            console.warn("Logo container or h1 element not found for animation.");
+        if (!logo || !h1) {
+            return;
         }
-        this.updateQRCode(); // Show initial state
-        this.initDarkMode(); // Initialize dark mode
+
+        logo.addEventListener('mouseenter', () => {
+            logo.classList.add('logo-animate');
+            h1.classList.add('text-animate');
+        });
+
+        logo.addEventListener('mouseleave', () => {
+            logo.classList.remove('logo-animate');
+            h1.classList.remove('text-animate');
+        });
     }
 
     initDarkMode() {
@@ -130,13 +117,10 @@ class QRCodeGenerator {
     }
 
     bindEvents() {
-        // Generate QR code button
-        this.generateBtn.addEventListener('click', () => this.generateQRCode());
-        
-        // Enter key in URL input
+        this.urlInput.addEventListener('input', () => this.updateQRCode());
         this.urlInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                this.generateQRCode();
+                this.updateQRCode();
             }
         });
 
@@ -147,8 +131,7 @@ class QRCodeGenerator {
         // Drag and drop events
         this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
         this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-        this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));        // Download button
-        this.downloadBtn.addEventListener('click', () => this.downloadQRCode());
+        this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
 
         // Color display click opens color picker
         this.qrColorDisplay.addEventListener('click', () => this.qrColorInput.click());
@@ -156,10 +139,20 @@ class QRCodeGenerator {
         this.qrColorHexInput.addEventListener('input', () => this.setColor('qr', this.qrColorHexInput.value));
         this.clearQrColorBtn.addEventListener('click', () => this.setColor('qr', '#000000'));
 
+        this.qrColorSecondaryDisplay.addEventListener('click', () => this.qrColorSecondaryInput.click());
+        this.qrColorSecondaryInput.addEventListener('input', () => this.setColor('qr2', this.qrColorSecondaryInput.value));
+        this.qrColorSecondaryHexInput.addEventListener('input', () => this.setColor('qr2', this.qrColorSecondaryHexInput.value));
+
+        this.qrColorMode.addEventListener('change', () => {
+            this.currentColorMode = this.qrColorMode.value;
+            this.updateSecondaryColorVisibility();
+            this.updateQRCode();
+        });
+
         this.bgColorDisplay.addEventListener('click', () => this.bgColorInput.click());
         this.bgColorInput.addEventListener('input', () => this.setColor('bg', this.bgColorInput.value));
         this.bgColorHexInput.addEventListener('input', () => this.setColor('bg', this.bgColorHexInput.value));
-        this.clearBgColorBtn.addEventListener('click', () => this.setColor('bg', '#FFFFFF'));
+        this.clearBgColorBtn.addEventListener('click', () => this.setColor('bg', '#ffffff'));
 
         // Size buttons
         this.sizeButtons.forEach(btn => {
@@ -167,7 +160,6 @@ class QRCodeGenerator {
                 this.sizeButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.currentSize = parseInt(btn.dataset.size);
-                this.updatePreview();
                 this.updateQRCode();
             });
         });
@@ -178,21 +170,13 @@ class QRCodeGenerator {
                 this.styleButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.currentStyle = btn.dataset.style;
-                this.updatePreview();
                 this.updateQRCode();
             });
         });
 
-        // Real-time updates when customization changes
         this.qrColorInput.addEventListener('change', () => this.updateQRCode());
+        this.qrColorSecondaryInput.addEventListener('change', () => this.updateQRCode());
         this.bgColorInput.addEventListener('change', () => this.updateQRCode());
-        
-        // Real-time updates (debounced)
-        this.urlInput.addEventListener('input', () => this.updateQRCode());
-        
-        // Initialize color displays
-        this.updateColorDisplay('qr', '#000000');
-        this.updateColorDisplay('bg', '#ffffff');
     }
 
     handleDragOver(e) {
@@ -223,43 +207,46 @@ class QRCodeGenerator {
     }
 
     processFile(file) {
-        // Validate file
         if (!file.type.startsWith('image/')) {
             this.showMessage('Please select an image file.', 'error');
             return;
         }
 
-        if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        if (file.size > 2 * 1024 * 1024) {
             this.showMessage('Image size should be less than 2MB.', 'error');
             return;
-        }        // Read file
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
+            const dataUrl = e.target?.result;
+            if (typeof dataUrl !== 'string') {
+                return;
+            }
+
             this.centerImage = new Image();
             this.centerImage.onload = () => {
-                this.showImagePreview(e.target.result);
+                this.showImagePreview(dataUrl);
                 this.updateQRCode();
-                this.updatePreview();
             };
-            this.centerImage.src = e.target.result;
+            this.centerImage.src = dataUrl;
         };
         reader.readAsDataURL(file);
     }
 
-    showImagePreview(file) {
-        if (file) {
-            this.imageFile = file;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const previewContainer = document.getElementById('image-preview');
-                previewContainer.innerHTML = `
-                    <img src="${e.target.result}" alt="Image Preview" class="preview-image">
-                    <button type="button" id="remove-image-btn" class="remove-image-btn" title="Remove image">&times;</button>
-                `;
-                document.getElementById('remove-image-btn').addEventListener('click', () => this.removeImage());
-                this.updateQRCode(); // Update QR code when image is added
-            };
-            reader.readAsDataURL(file);
+    showImagePreview(dataUrl) {
+        if (!dataUrl) {
+            return;
+        }
+
+        this.imagePreview.innerHTML = `
+            <img src="${dataUrl}" alt="Image Preview" class="preview-image">
+            <button type="button" id="remove-image-btn" class="remove-image-btn" title="Remove image">&times;</button>
+        `;
+
+        const removeBtn = document.getElementById('remove-image-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => this.removeImage());
         }
     }
 
@@ -268,18 +255,6 @@ class QRCodeGenerator {
         this.imagePreview.innerHTML = '';
         this.fileInput.value = '';
         this.updateQRCode();
-        this.updatePreview();
-    }
-
-    generateQRCode() {
-        const text = this.urlInput.value.trim();
-        
-        if (!text) {
-            this.showMessage('Please enter some text or URL.', 'error');
-            return;
-        }        this.showMessage('Generating QR Code...', 'loading');
-        
-        this.renderQRCode(text);
     }
 
     updateQRCode() {
@@ -298,15 +273,29 @@ class QRCodeGenerator {
     }
 
     renderQRCode(text) {
+        const dotOptions = {
+            type: this.getStyleType(this.currentStyle)
+        };
+
+        if (this.currentColorMode === 'solid') {
+            dotOptions.color = this.qrColorInput.value;
+        } else {
+            dotOptions.gradient = {
+                type: this.currentColorMode === 'radial' ? 'radial' : 'linear',
+                rotation: this.getGradientRotation(this.currentColorMode),
+                colorStops: [
+                    { offset: 0, color: this.qrColorInput.value },
+                    { offset: 1, color: this.qrColorSecondaryInput.value }
+                ]
+            };
+        }
+
         const options = {
             width: this.currentSize,
             height: this.currentSize,
             data: text,
             image: this.centerImage ? this.centerImage.src : undefined,
-            dotsOptions: {
-                color: this.qrColorInput.value,
-                type: this.getStyleType(this.currentStyle)
-            },
+            dotsOptions: dotOptions,
             backgroundOptions: {
                 color: this.bgColorInput.value
             },
@@ -329,93 +318,27 @@ class QRCodeGenerator {
         }
 
         this.qrCanvas = parent.querySelector('canvas') || null;
-        document.getElementById('qr-result').style.display = 'block';
-    }
-
-    // Legacy no-op: older code paths call updatePreview()
-    updatePreview() {}
-
-    downloadQRCode() {
-        if (this.qrStyler) {
-            this.qrStyler.download({ name: 'qrcode', extension: 'png' });
-        }
     }
 
     setColor(type, value) {
-        // Validate hex
         let hex = value;
         if (!hex.startsWith('#')) hex = '#' + hex;
         if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+
         if (type === 'qr') {
             this.qrColorInput.value = hex;
             this.qrColorHexInput.value = hex.toUpperCase();
             this.qrColorDisplay.style.backgroundColor = hex;
+        } else if (type === 'qr2') {
+            this.qrColorSecondaryInput.value = hex;
+            this.qrColorSecondaryHexInput.value = hex.toUpperCase();
+            this.qrColorSecondaryDisplay.style.backgroundColor = hex;
         } else {
             this.bgColorInput.value = hex;
             this.bgColorHexInput.value = hex.toUpperCase();
             this.bgColorDisplay.style.backgroundColor = hex;
         }
         this.updateQRCode();
-    }
-
-    selectSize(button) {
-        // Remove active class from all buttons
-        this.sizeButtons.forEach(btn => btn.classList.remove('active'));
-        
-        // Add active class to clicked button
-        button.classList.add('active');
-        
-        // Update current size
-        this.currentSize = parseInt(button.dataset.size);
-        
-        // Update QR code
-        this.updateQRCode();
-    }
-
-    selectStyle(button) {
-        // Remove active class from all buttons
-        this.styleButtons.forEach(btn => btn.classList.remove('active'));
-        
-        // Add active class to clicked button
-        button.classList.add('active');
-        
-        // Update current style
-        this.currentStyle = button.dataset.style;
-        
-        // Update QR code
-        this.updateQRCode();
-    }
-
-    processFile(file) {
-        // Validate file
-        if (!file.type.startsWith('image/')) {
-            this.showMessage('Please select an image file.', 'error');
-            return;
-        }
-
-        if (file.size > 2 * 1024 * 1024) { // 2MB limit
-            this.showMessage('Image size should be less than 2MB.', 'error');
-            return;
-        }        // Read file
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            this.centerImage = new Image();
-            this.centerImage.onload = () => {
-                this.showImagePreview(e.target.result);
-                this.updateQRCode();
-                this.updatePreview();
-            };
-            this.centerImage.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    removeImage() {
-        this.centerImage = null;
-        this.imagePreview.innerHTML = '';
-        this.fileInput.value = '';
-        this.updateQRCode();
-        this.updatePreview();
     }
 
     showMessage(message, type) {
@@ -456,12 +379,34 @@ class QRCodeGenerator {
     updateColorDisplay(type, color) {
         if (type === 'qr') {
             this.qrColorDisplay.style.backgroundColor = color;
-            this.qrColorValue.textContent = color.toUpperCase();
+            this.qrColorHexInput.value = color.toUpperCase();
+        } else if (type === 'qr2') {
+            this.qrColorSecondaryDisplay.style.backgroundColor = color;
+            this.qrColorSecondaryHexInput.value = color.toUpperCase();
         } else if (type === 'bg') {
             this.bgColorDisplay.style.backgroundColor = color;
-            this.bgColorValue.textContent = color.toUpperCase();
+            this.bgColorHexInput.value = color.toUpperCase();
         }
         this.updateQRCode();
+    }
+
+    updateSecondaryColorVisibility() {
+        const secondaryGroup = document.getElementById('qr-secondary-color-group');
+        if (!secondaryGroup) {
+            return;
+        }
+
+        secondaryGroup.style.display = this.currentColorMode === 'solid' ? 'none' : 'flex';
+    }
+
+    getGradientRotation(mode) {
+        if (mode === 'gradient-horizontal') {
+            return 0;
+        }
+        if (mode === 'gradient-vertical') {
+            return Math.PI / 2;
+        }
+        return 0;
     }
 }
 
